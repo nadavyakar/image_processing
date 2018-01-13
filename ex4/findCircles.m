@@ -42,7 +42,11 @@ function [circles,cImg] = findCircles(img)
         for c_x=1:cols
             for r=1:round(sqrt((cols-1)^2+(rows-1)^2))
                 curr_ccount=ccount(c_y,c_x,r);
-         
+                % a pixel with a certain radius which was already found not
+                % to be the maximum of another pixel (in case it was with
+                % the same counting score in the hough space) - wouldn't be
+                % picked, in order to prevent cases of parallel circles
+                % with the same detected score in their center
                 if curr_ccount>r*pi/2 && voted(c_y,c_x,r)==0
                     % check this circle center is the maximal among its
                     % neighbors
@@ -87,5 +91,3 @@ function [circles,cImg] = findCircles(img)
             end
         end
     end
-    %figure;imshow(cedges);
-    figure;imshow(cImg);

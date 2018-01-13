@@ -1,5 +1,6 @@
 % detect img edges using canny edge detection
 % using a 4 neighbor NMS
+
 function [newImg] = edgeDetect(img)
     th_low=0.05;
     th_high=0.1;
