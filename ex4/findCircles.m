@@ -96,4 +96,3 @@ function [circles,cImg] = findCircles(img)
             end
         end
     end
-    figure;imshow(cImg);
