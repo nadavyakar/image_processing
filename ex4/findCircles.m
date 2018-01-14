@@ -6,7 +6,6 @@ function [circles,cImg] = findCircles(img)
     [rows, cols] = size(cedges);
     % circles counter matrix
     ccount=zeros([rows, cols round(sqrt(rows^2+cols^2))]);
-    rmax=0;
     cmax=0;
     for y=1:rows
         for x=1:cols
@@ -16,9 +15,6 @@ function [circles,cImg] = findCircles(img)
                     for c_x=1:cols
                         r=round(sqrt((x-c_x)^2+(y-c_y)^2));
                         if r>0
-                            if r>rmax
-                                rmax=r;
-                            end
                             ccount(c_y,c_x,r)=ccount(c_y,c_x,r)+1;
                             if ccount(c_y,c_x,r)>cmax
                                 cmax=ccount(c_y,c_x,r);
@@ -42,12 +38,20 @@ function [circles,cImg] = findCircles(img)
         for c_x=1:cols
             for r=1:round(sqrt((cols-1)^2+(rows-1)^2))
                 curr_ccount=ccount(c_y,c_x,r);
+                % dynamic circle counter threshold per the circle radius
+                % size - the larger the circle, is expected to be, the more
+                % pixels we'd expect to find on its perimeter
+                if r<30
+                    ccount_th=r*pi/1.5;
+                else
+                    ccount_th=r*pi/2;
+                end
                 % a pixel with a certain radius which was already found not
                 % to be the maximum of another pixel (in case it was with
                 % the same counting score in the hough space) - wouldn't be
                 % picked, in order to prevent cases of parallel circles
                 % with the same detected score in their center
-                if curr_ccount>r*pi/2 && voted(c_y,c_x,r)==0
+                if curr_ccount>ccount_th && voted(c_y,c_x,r)==0
                     % check this circle center is the maximal among its
                     % neighbors
                     max_ccount=curr_ccount;
@@ -67,6 +71,7 @@ function [circles,cImg] = findCircles(img)
                             end
                         end
                     end
+                    % a circle was found
                     if curr_ccount==max_ccount
                     	circles=[circles;[c_x,c_y,r]];
                     	c_i=c_i+1;
@@ -91,3 +96,4 @@ function [circles,cImg] = findCircles(img)
             end
         end
     end
+    figure;imshow(cImg);
